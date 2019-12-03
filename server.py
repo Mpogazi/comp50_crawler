@@ -45,7 +45,7 @@ def post_update_stock():
 		stock = data['company']
 		user  = dumps(users.update())
 		return {data: "Successfully updated"}
-	pass
+	except:
 		return {data: "Failed to Update"}
 
 @api.route('/create_watchlist', methods=['POST'])
