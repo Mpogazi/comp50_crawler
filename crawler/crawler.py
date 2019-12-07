@@ -6,7 +6,7 @@ from util import *
 
 class Crawler:
 
-    project_name = ''
+    dir_name = ''
     base_url = ''
     domain_name = ''
     queue_file = ''
@@ -15,20 +15,20 @@ class Crawler:
     crawled = set()
     crawled_queue = Queue()
 
-    def __init__(self, project_name, base_url, domain_name):
-        Crawler.project_name = project_name
+    def __init__(self, dir_name, base_url, domain_name):
+        Crawler.dir_name = dir_name
         Crawler.base_url = base_url
         Crawler.domain_name = domain_name
-        Crawler.queue_file = Crawler.project_name + '/queue.txt'
-        Crawler.crawled_file = Crawler.project_name + '/crawled.txt'
+        Crawler.queue_file = Crawler.dir_name + '/queue.txt'
+        Crawler.crawled_file = Crawler.dir_name + '/crawled.txt'
         self.boot()
         self.crawl_page('First spider', Crawler.base_url)
 
-    # Creates directory and files for project on first run and starts the spider
+    # Creates directory and files for dir on first run and starts the spider
     @staticmethod
     def boot():
-        create_project_dir(Crawler.project_name)
-        create_data_files(Crawler.project_name, Crawler.base_url)
+        create_dir(Crawler.dir_name)
+        create_data_files(Crawler.dir_name, Crawler.base_url)
         Crawler.queue = file_to_set(Crawler.queue_file)
         Crawler.crawled = file_to_set(Crawler.crawled_file)
 
@@ -60,13 +60,13 @@ class Crawler:
             return set()
         return finder.page_links()
 
-    # Saves queue data to project files
+    # Saves queue data to dir files
     @staticmethod
     def add_links_to_queue(links):
         for url in links:
             if (url in Crawler.queue) or (url in Crawler.crawled):
                 continue
-            if Crawler.domain_name != get_domain_name(url):
+            if Crawler.domain_name != get_domain_name_and_path(url, "finance-and-economics"):
                 continue
             Crawler.queue.add(url)
 

@@ -10,6 +10,15 @@ def get_domain_name(url):
     except:
         return ''
 
+# Get domain name and path (example.com/articles)
+def get_domain_name_and_path(url, path):
+    try:
+        results = get_sub_domain_name(url).split('.')
+        return results[-2] + '.' + results[-1] + '/' + path
+    except:
+        return ''
+
+
 
 # Get sub domain name (name.example.com)
 def get_sub_domain_name(url):
@@ -17,17 +26,18 @@ def get_sub_domain_name(url):
         return urlparse(url).netloc
     except:
         return ''
-# Each website is a separate project (folder)
-def create_project_dir(directory):
+
+# Each website is a separate dir (folder)
+def create_dir(directory):
     if not os.path.exists(directory):
         print('Creating directory ' + directory)
         os.makedirs(directory)
 
 
 # Create queue and crawled files (if not created)
-def create_data_files(project_name, base_url):
-    queue = os.path.join(project_name , 'queue.txt')
-    crawled = os.path.join(project_name,"crawled.txt")
+def create_data_files(dir_name, base_url):
+    queue = os.path.join(dir_name , 'queue.txt')
+    crawled = os.path.join(dir_name,"crawled.txt")
     if not os.path.isfile(queue):
         write_file(queue, base_url)
     if not os.path.isfile(crawled):
