@@ -5,7 +5,7 @@ from flask import Flask, json, request
 from bson.json_util import dumps
 
 # globals
-URI = "mongodb://comp50-mongo:cgAWFSlExkZp33BpFjuJLmGO7oFe31CigL3wQ0Fte6klnszZpPklc6CUfsBPNN89svY8uBK73Z9yQRWGzP83OA==@comp50-mongo.documents.azure.com:10255/?ssl=true&replicaSet=globaldb"
+URI = "mongodb://heroku_z03b9kqp:eit8th40c96ss3e2mqlph3loo5@ds253418.mlab.com:53418/heroku_z03b9kqp"
 db_50    = MongoClient(URI)['concurrency']
 listings = db_50['listings']
 stocks   = db_50['stocks']
