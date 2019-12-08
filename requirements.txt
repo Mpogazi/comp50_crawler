@@ -16,7 +16,6 @@ pycrypto==2.6.1
 Pygments==2.2.0
 pymongo==3.5.1
 pyxdg==0.25
-sage==8.1
 SecretStorage==2.3.1
 six==1.11.0
 Werkzeug==0.16.0
