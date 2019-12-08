@@ -15,6 +15,10 @@ user = ['farmer', 'john', 'tomato']
 
 api = Flask(__name__)
 
+@api.route('/', methods=['GET'])
+def get_index():
+	return json.dumps('successfully set the app')
+
 @api.route('/users', methods=['GET'])
 def get_users():
 	return json.dumps(user)
