@@ -11,12 +11,13 @@ listings = db_50['listings']
 stocks   = db_50['stocks']
 users    = db_50['users']
 websites = db_50['websites']
+user = ['farmer', 'john', 'tomato']
 
 api = Flask(__name__)
 
 @api.route('/users', methods=['GET'])
 def get_users():
-	return json.dumps(users)
+	return json.dumps(user)
 
 @api.route('/user', methods=['POST'])
 def get_user():
