@@ -38,10 +38,15 @@ def create_dir(directory):
 def create_data_files(dir_name, base_url):
     queue = os.path.join(dir_name , 'queue.txt')
     crawled = os.path.join(dir_name,"crawled.txt")
+    articles = os.path.join(dir_name, "articles.txt")
     if not os.path.isfile(queue):
         write_file(queue, base_url)
     if not os.path.isfile(crawled):
         write_file(crawled, '')
+    if not os.path.isfile(articles):
+        write_file(articles, '')
+
+
 
 
 # Create a new file

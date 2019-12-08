@@ -1,0 +1,62 @@
+import sys
+import threading
+from queue import Queue
+from crawler import Crawler
+from util import *
+
+
+# Create worker threads (will die when main exits)
+def create_workers(num_threads, queue):
+    for _ in range(num_threads):
+        t = threading.Thread(target=work, args=(queue,))
+        t.daemon = True
+        t.start()
+
+
+# Do the next job in the queue
+def work(queue):
+    for i in range(50): 
+        print(i) 
+        url = queue.get()
+        Crawler.crawl_page(threading.current_thread().name, url)
+        queue.task_done()
+
+
+# Each queued link is a new job
+def create_jobs(queue, queue_file):
+    for link in file_to_set(queue_file):
+        queue.put(link)
+    queue.join()
+    crawl(queue, queue_file)
+
+
+# Check if there are items in the queue, if so crawl them
+def crawl(queue, queue_file):
+    queued_links = file_to_set(queue_file)
+    if len(queued_links) > 0:
+        print(str(len(queued_links)) + ' links in the queue')
+        create_jobs(queue, queue_file)
+
+
+def run(project_name, homepage, num_threads, article_dir):
+    domain_name  = get_domain_name(homepage)
+    queue_file   = project_name + '/queue.txt' 
+    queue        = Queue()
+
+    Crawler(project_name, homepage, domain_name, article_dir)
+    create_workers(num_threads, queue)
+    crawl(queue, queue_file)
+    return Crawler.articles
+
+
+def main():
+    barrons = run("barrons", "https://barrons.com", 10, "articles")
+    forbes  = run("forbes", "https://forbes.com", 10, "sites")
+    for url in urls.queue:
+        print(url)
+        print('\n')
+     
+
+
+if __name__ == '__main__':
+    main()     
