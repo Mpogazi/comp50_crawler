@@ -23,7 +23,7 @@ def get_index():
 @api.route('/add_user', methods=['POST'])
 def add_user():
 	req_data = request.get_json()
-	return json.dumps(req_date)
+	return json.dumps(req_data)
 
 
 @api.route('/users', methods=['GET'])
