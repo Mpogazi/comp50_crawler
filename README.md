@@ -1,20 +1,26 @@
 # comp50_crawler
 Final project for the comp 50 class.
 
-## Mongo db settings:
-Host: comp50-mongo.documents.azure.com
+## mongo /server usage: 
+- url: https://crawler-concurrency.herokuapp.com/add_stock_mentions
+method: POST
+req_data: example: 
+``{
+    "name": "Apple Inc.",
+    "update": [{"article_title": "Apple is broken", "article_url": "apple.com"}, {"article_title": "Apple is mad","article_url": "lkjdsfasjldkafd.com"}]
+}``
 
-Port: 10255
+- url: https://crawler-concurrency.herokuapp.com/add_user
+method: POST
+req_data: example: 
+``{
+    "name": "Fabrice B. Mpogazi",
+    "email": "fmpogazi@gmail.com",
+    "watchlist": ["Apple Inc.", "Microsoft Inc.", "Google LLC."]
+}``
 
-Username: comp50-mongo
-
-password: cgAWFSlExkZp33BpFjuJLmGO7oFe31CigL3wQ0Fte6klnszZpPklc6CUfsBPNN89svY8uBK73Z9yQRWGzP83OA==
-
-
-## Shell Access to Mongo db:
-Run either one of those scripts...
-
-Bash: mongo comp50-mongo.documents.azure.com:10255 -u comp50-mongo -p cgAWFSlExkZp33BpFjuJLmGO7oFe31CigL3wQ0Fte6klnszZpPklc6CUfsBPNN89svY8uBK73Z9yQRWGzP83OA== --ssl --sslAllowInvalidCertificates
-
-PowerShell: mongo.exe comp50-mongo.documents.azure.com:10255 -u comp50-mongo -p cgAWFSlExkZp33BpFjuJLmGO7oFe31CigL3wQ0Fte6klnszZpPklc6CUfsBPNN89svY8uBK73Z9yQRWGzP83OA== --ssl --sslAllowInvalidCertificates
+- url: https://crawler-concurrency.herokuapp.com/
+method: POST
+req_data: example: 
+``{}``
 

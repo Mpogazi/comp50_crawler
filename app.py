@@ -22,17 +22,19 @@ def get_index():
 
 @api.route('/add_user', methods=['POST'])
 def add_user():
-	req_data = request.get_json()
-	users.insert_one(req_data)
+	req_data = request.json
+	name = req_data['name']
+	email = req_data['email']
+	watchlist = req_data['watchlist']
+	users.insert_one({ 'name': name, 'email': email, 'watchlist': watchlist })
 	return ('successfully added user', 200)
 
 @api.route('/add_stock_mentions', methods=['POST'])
 def add_stock():
 	req_data = request.json
-	print req_data
 	st_name = req_data['name']
 	st_update = req_data['update']
-	stocks.update({ 'name': st_name}, { '$push': { 'mentions': { '$each': st_update } }});
+	stocks.update({ 'name': st_name}, { '$push': { 'mentions': { '$each': st_update } }})
 	return('successfully added the new mention', 200)
 
 @api.route('/add_watchlist', methods=[''])
