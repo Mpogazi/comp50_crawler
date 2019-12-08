@@ -23,8 +23,12 @@ def get_index():
 @api.route('/add_user', methods=['POST'])
 def add_user():
 	req_data = request.get_json()
-	return json.dumps(req_data)
+	users.insert_one(req_data).inserted_id
+	return ('successfully added user', 200)
 
+@api.route('/add_watchlist', methods=[''])
+def add_watchlist():
+	return ('successfully added watchlist', 200)
 
 @api.route('/users', methods=['GET'])
 def get_users():
