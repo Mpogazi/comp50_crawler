@@ -48,13 +48,14 @@ def run():
     Crawler(project_name, homepage, domain_name)
     create_workers(num_threads, queue)
     crawl(queue, queue_file)
-    return Crawler.url_list() 
+    return Crawler.crawled_queue
 
 
 def main():
     urls = run()
-    print(urls)
-    print(len(urls))
+    for url in urls.queue:
+        print(url)
+        print('\n')
      
 
 

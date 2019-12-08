@@ -1,5 +1,6 @@
 from urllib.request import urlopen
 from link_finder import LinkFinder
+from queue import Queue
 from util import *
 
 
@@ -12,6 +13,7 @@ class Crawler:
     crawled_file = ''
     queue = set()
     crawled = set()
+    crawled_queue = Queue()
 
     def __init__(self, project_name, base_url, domain_name):
         Crawler.project_name = project_name
@@ -39,6 +41,7 @@ class Crawler:
             Crawler.add_links_to_queue(Crawler.gather_links(page_url))
             Crawler.queue.remove(page_url)
             Crawler.crawled.add(page_url)
+            Crawler.crawled_queue.put(page_url)
             Crawler.update_files()
 
     # Converts raw response data into readable information and checks for proper html formatting
@@ -72,6 +75,4 @@ class Crawler:
         set_to_file(Crawler.queue, Crawler.queue_file)
         set_to_file(Crawler.crawled, Crawler.crawled_file)
 
-    @staticmethod
-    def url_list():
-        return list(Crawler.crawled)
+
