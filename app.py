@@ -5,14 +5,14 @@ from flask import Flask, json, request
 from bson.json_util import dumps
 
 # globals
-
-URI = "mongodb://heroku_z03b9kqp:eit8th40c96ss3e2mqlph3loo5@ds253418.mlab.com:53418/heroku_z03b9kqp"
-db_50    = MongoClient(URI)['concurrency']
+URI = "ds253418.mlab.com"
+db_50    = MongoClient(URI, 53418)
+db_50    = db_50['heroku_z03b9kqp']
+db_50.authenticate('concurrency', 'Rwanda@123456')
 listings = db_50['listings']
 stocks   = db_50['stocks']
 users    = db_50['users']
 websites = db_50['websites']
-
 
 api = Flask(__name__)
 
