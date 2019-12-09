@@ -77,14 +77,14 @@ def add_user():
 
 @api.route('/add_mention', methods=['POST'])
 def add_mention():
-	req_data = request.data
+	req_data = request.json.form
 	stocks.insert_one({'data':req_data})
 	return ('successfully added mention', 200)
 
 
 @api.route('/add_stock_mentions', methods=['POST'])
 def add_stock():
-	req_data = request.form
+	req_data = request.json
 	st_name = req_data['name']
 	st_update = req_data['update']
 	stocks.update({ 'name': st_name}, { '$push': { 'mentions': { '$each': st_update } }})
