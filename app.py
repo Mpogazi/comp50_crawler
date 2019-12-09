@@ -77,7 +77,7 @@ def add_user():
 
 @api.route('/add_mention', methods=['POST'])
 def add_mention():
-	req_data = request.json
+	req_data = request.data
 	stocks.insert_one({'data':req_data})
 	return ('successfully added mention', 200)
 
