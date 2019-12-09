@@ -17,16 +17,16 @@ websites = db_50['websites']
 
 api = Flask(__name__)
 
-def send_email():
-	message = Mail(
-		from_email='crawler@comp50.com',
-		to_emails='fbigabiro@gmail.com',
-		subject='Sending with Twilio SendGrid is Fun',
-		html_content='<strong>and easy to do anywhere, even with Python</strong>')
+# def send_email():
+# 	message = Mail(
+# 		from_email='crawler@comp50.com',
+# 		to_emails='fbigabiro@gmail.com',
+# 		subject='Sending with Twilio SendGrid is Fun',
+# 		html_content='<strong>and easy to do anywhere, even with Python</strong>')
 
-	sg = SendGridAPIClient('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')
-	response = sg.send(message)
-	print(response.status_code, response.body, response.headers)
+# 	sg = SendGridAPIClient('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')
+# 	response = sg.send(message)
+# 	print(response.status_code, response.body, response.headers)
 
 @api.route('/', methods=['GET'])
 def get_index():
