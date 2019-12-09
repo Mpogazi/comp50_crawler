@@ -35,16 +35,16 @@ class Analyzer:
 
     STOP = "ANALYZER_STOP"
 
-    def __init__(self, target_words, links_q, num_threads, DB_url = ""):
-        self.target_words = target_words
+    def __init__(self, stock_names, articles_queue, num_threads, DB_url = ""):
+        self.stock_names = stock_names
         self.queue = links_q
         self.num_threads = num_threads
         self.threads = []
 
 
         # parallel dictionaries
-        self.relevant_articles = {i:{"name": i, "update": []} for i in target_words}
-        self.stock_locks = {i:threading.Lock() for i in target_words}
+        self.relevant_articles = {i:{"name": i, "update": []} for i in stock_names}
+        self.stock_locks = {i:threading.Lock() for i in stock_names}
 
         self.DB_URL = DB_url
         self.company_words = ["Inc.", "LLC", "Corp.", "Co."]
@@ -81,7 +81,7 @@ class Analyzer:
                 url = self.queue.get(True, 10)
                 continue
 
-            for stock in self.target_words:
+            for stock in self.stock_names:
                 to_search = self.clean_stock(stock)
                 if to_search in soup.title.text:
                     with self.stock_locks[stock]:
