@@ -21,7 +21,7 @@ api = Flask(__name__)
 def send_email():
 	message = Mail(
 		from_email='crawler@comp50.com',
-		to_emails='fbigabiro@gmail.com',
+		to_emails='Fabrice.Mpogazi@tufts.edu',
 		subject='Sending with Twilio SendGrid is Fun',
 		html_content='<strong>and easy to do anywhere, even with Python</strong>')
 
