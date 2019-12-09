@@ -32,10 +32,10 @@ class ArticleFinder():
 
     # Check if there are items in the queue, if so crawl them
     def crawl(self, curr_depth, queue, queue_file):
-        print("CURR_self.depth_IS -  " + str(curr_depth))
+        #print("CURR_self.depth_IS -  " + str(curr_depth))
         queued_links = file_to_set(queue_file)
         if len(queued_links) > 0:
-            print(str(len(queued_links)) + ' links in the queue')
+            #print(str(len(queued_links)) + ' links in the queue')
             if curr_depth < self.depth:
                 self.create_jobs(curr_depth + 1, queue, queue_file)
 
@@ -48,11 +48,13 @@ class ArticleFinder():
         self.crawl(0, queue, queue_file)    
 
     def find_articles(self, articles_queue):
-        publications = [("kiplinger", "https://kiplinger.com", 10, "article"),
-                        ("thestreet", "https://thestreet.com", 10, "investing"),
-                        ("economist", "https://economist.com", 10, "finance-and-economics"),
-                        ("marketwatch", "https://www.marketwatch.com", 10, "story")]
-
+        publications = [("kiplinger", "https://kiplinger.com", 200, "article"),
+                        ("thestreet", "https://thestreet.com", 200, "investing"),
+                        ("economist", "https://economist.com", 200, "finance-and-economics"),
+                        ("marketwatch", "https://www.marketwatch.com", 200, "story"),
+                        ("cabotwealth", "https://www.cabotwealth.com", 200, "growth-stocks")]
         for i in publications:
             proj_name, homepage, num_threads, article_dir = i
             self.crawl_publication(proj_name, homepage, num_threads, article_dir, articles_queue)
+
+        articles_queue.put("ANALYZER_STOP")

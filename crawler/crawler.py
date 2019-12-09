@@ -3,7 +3,6 @@ from link_finder import LinkFinder
 from queue import Queue
 from util import *
 
-
 class Crawler:
 
     dir_name = ''
@@ -15,34 +14,33 @@ class Crawler:
     articles_file = ''
     queue = set()
     crawled = set()
-    articles = set()
 
     def __init__(self, dir_name, base_url, domain_name, article_dir, articles_queue):
-        Crawler.dir_name = dir_name
-        Crawler.base_url = base_url
-        Crawler.domain_name = domain_name
-        Crawler.article_dir = article_dir
-        Crawler.queue_file = Crawler.dir_name + '/queue.txt'
-        Crawler.crawled_file = Crawler.dir_name + '/crawled.txt'
+        Crawler.dir_name      = dir_name
+        Crawler.base_url      = base_url
+        Crawler.domain_name   = domain_name
+        Crawler.article_dir   = article_dir
+        Crawler.queue_file    = Crawler.dir_name + '/queue.txt'
+        Crawler.crawled_file  = Crawler.dir_name + '/crawled.txt'
         Crawler.articles_file = Crawler.dir_name + '/articles.txt'
         self.boot()
-        self.crawl_page('First crawler', Crawler.base_url, articles_queue)
+        self.crawl_page(Crawler.base_url, articles_queue)
 
     # Creates directory and files for dir on first run and starts the spider
     @staticmethod
     def boot():
         create_dir(Crawler.dir_name)
         create_data_files(Crawler.dir_name, Crawler.base_url)
-        Crawler.queue = file_to_set(Crawler.queue_file)
-        Crawler.crawled = file_to_set(Crawler.crawled_file)
+        Crawler.queue    = file_to_set(Crawler.queue_file)
+        Crawler.crawled  = file_to_set(Crawler.crawled_file)
         Crawler.articles = file_to_set(Crawler.articles_file)
 
     # Updates user display, fills queue and updates files
     @staticmethod
-    def crawl_page(thread_name, page_url, articles_queue):
+    def crawl_page(page_url, articles_queue):
         if page_url not in Crawler.crawled:
             #print(thread_name + ' now crawling ' + page_url)
-            print('Queue ' + str(len(Crawler.queue)) + ' | Crawled  ' + str(len(Crawler.crawled)))
+            #print('Queue ' + str(len(Crawler.queue)) + ' | Crawled  ' + str(len(Crawler.crawled)))
             #print("PAGE_URL_IS-     " + page_url)
             Crawler.add_links_to_queue(Crawler.gather_links(page_url))
             Crawler.queue.remove(page_url)
