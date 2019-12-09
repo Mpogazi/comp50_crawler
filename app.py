@@ -105,4 +105,4 @@ def create_watchlist():
 	pass
 
 if __name__ == "__main__":
-	api.run(threaded=True, port=5000)
+	api.run()
