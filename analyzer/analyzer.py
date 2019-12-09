@@ -1,89 +1,133 @@
-#
-# given a stock and a list of links
-# parses through each ilink to decide if it
-# is relevant
+'''
+ANALYZER
 
-# this class wraps the consumers in the producer-consumer
-# model. The objects to be consumed are urls
+Description:
+    This class
 
+
+Synchronization:
+    Queue: This class uses a synchronized Queue from the python queue module
+           The analyzer spawns multiple threads that act as consumers in a
+           producer-consumer relationship with the Crawler class.
+    Locks: Multile threads will be accessing and updating the same dictionary,
+           so to prevent two threads from changing something at the same index,
+           we've made a second dictionary that holds locks for each item in the
+           main dictionary.
+'''
 
 
 import threading
-import requests
+import queue
+import sys
+
+
+
+
+from bs4 import BeautifulSoup
 import urllib.request
-import re
-from SafeQueue import SafeQueue
-#from bs4 import BeautifulSoup
+import requests
+
+
+
 
 class Analyzer:
 
-    
+    STOP = "~"
 
-    def __init__(self, project_name, target_word, links_q, num_threads):
-        self.target_word = target_word
+    def __init__(self, target_words, links_q, num_threads, DB_url):
+        self.target_words = target_words
         self.queue = links_q
         self.num_threads = num_threads
         self.threads = []
-        self.relevant_urls = []
 
-        self.__STOP = "~"
+        # parallel dictionaries
+        self.relevant_articles = {i:[] for i in target_words}
+        self.stock_locks = {i:threading.Lock() for i in target_words}
 
-        # testing only
-        self.project_name = project_name
-        #self.test_produce()
+        self.DB_URL = DB_url
+
 
     def start(self):
         self.threads = [threading.Thread(target = self.analyze, args = [])
                         for i in range(self.num_threads)]
         for thread in self.threads:
             thread.start()
-    
+
     def join(self):
         for thread in self.threads:
-            thread.join()    
+            thread.join()
+
+        self.update_db()
+
+    def update_db(self):
+        if not self.DB_URL == "":
+            requests.post(self.DB_URL, data = self.relevant_articles)
+        return
 
     def analyze(self):
-        url = self.queue.get()
-        while url != self.__STOP:
-            #try:
-            req = urllib.request.Request(url)
-            
-            with urllib.request.urlopen(req) as response:
-                
-                the_page = response.read()
-               
-                print(the_page)
+        url = self.queue.get(True, 10)
+        while url != Analyzer.STOP:
 
-                if re.search(self.target_word, the_page):
-                    self.relevant_urls.append(url)
-            #except:
-                #print ("Error: Could not open ", url)
+            try:
+                source = urllib.request.urlopen(url)
+                soup = BeautifulSoup(source, 'html.parser')
+            except:
+                sys.stderr.write(threading.current_thread().name + " --- Error: Could not open " + url)
+                url = self.queue.get(True, 10)
+                continue
 
-            url = self.queue.get()
 
-        self.queue.put(self.__STOP)
+            for stock in self.target_words:
+                if stock in soup.title.text:
+                    with self.stock_locks[stock]:
+                        self.relevant_articles[stock].append((soup.title.text, url))
+                else:
+                    links = soup.find_all('p')
+                    for p in links:
+                        if stock in p.text.split():
+                            with self.stock_locks[stock]:
+                                self.relevant_articles[stock].append((soup.title.text, url))
+                            break
+            url = self.queue.get(True, 10)
+
+        self.queue.put(Analyzer.STOP)
+
+
+
+
+# **********************  Testing Only  *******************************
 
     def test_produce(self):
-        URLs = f.open(self.project_name + "/queue.txt")
-        for url in URLs:
-            url = url.rstrip()
+        f = open("analyzer/testQueue.txt")
+        for url in f:
             self.queue.put(url)
+        f.close()
+        self.queue.put(Analyzer.STOP)
 
-    def print_relevant_links(self):
-        for url in self.relevant_urls:
-            print(url)
 
+
+    def print_relevant_articles(self):
+        for stock in self.relevant_articles.keys():
+            print(stock)
+            for article in self.relevant_articles[stock]:
+                print(article[0])
+                print(article[1])
+                print()
+            print("\n")
+
+
+    def get_relevant_articles(self):
+        data = {}
+        data['articles'] = self.relevant_articles
+        return json.dumps(data)
 
 
 if __name__ == '__main__':
 
-    queue = SafeQueue()
-    queue.put('https://www.iflexion.com/blog/sentiment-analysis-python')
-    queue.put("~")
+    queue = queue.Queue()
 
-
-
-    a = Analyzer("test", "python", queue, 1)
+    a = Analyzer(["United", "Apple", "Microsoft", "Amazon", "TD", "Tesla"], queue, 10, "")
+    a.test_produce()
     a.start()
     a.join()
-    a.print_relevant_links()
+    a.print_relevant_articles()
