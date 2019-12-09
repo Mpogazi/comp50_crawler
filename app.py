@@ -1,6 +1,7 @@
 #! /usr/bin/python
 
 from pymongo import MongoClient
+# import requests
 from flask import Flask, json, request, jsonify
 from bson.json_util import dumps
 import os
@@ -18,16 +19,27 @@ websites = db_50['websites']
 
 api = Flask(__name__)
 
-def send_email():
-	message = Mail(
-		from_email='crawler@comp50.com',
-		to_emails='Fabrice.Mpogazi@tufts.edu',
-		subject='Sending with Twilio SendGrid is Fun',
-		html_content='<strong>and easy to do anywhere, even with Python</strong>')
+# def send_simple_message():
+# 	return requests.post(
+# 		"https://api.mailgun.net/v3/sandboxdb54350982b04926b51dc62456174097.mailgun.org/messages",
+# 		auth=("api", "b185da9453a6ef8352624808e205d7bb-5645b1f9-15f8d515"),
+# 		data={"from": "Mailgun Sandbox <postmaster@sandboxdb54350982b04926b51dc62456174097.mailgun.org>",
+# 			"to": "Pinto Leite Tomas <pintoleitetomas@gmail.com>",
+# 			"subject": "Hello Tomas",
+# 			"text": "Crawler team sent you an email!"})
 
-	sg = sendgrid.SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-	response = sg.send(message)
-	print(response.status_code, response.body, response.headers)
+# send_simple_message()
+
+# def send_email():
+# 	message = Mail(
+# 		from_email='crawler@comp50.com',
+# 		to_emails='Fabrice.Mpogazi@tufts.edu',
+# 		subject='Sending with Twilio SendGrid is Fun',
+# 		html_content='<strong>and easy to do anywhere, even with Python</strong>')
+
+# 	sg = sendgrid.SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+# 	response = sg.send(message)
+# 	print(response.status_code, response.body, response.headers)
 
 @api.route('/', methods=['GET'])
 def get_index():
@@ -59,9 +71,19 @@ def add_user():
 	name = req_data['name']
 	email = req_data['email']
 	watchlist = req_data['watchlist']
-	send_email()
+	# send_email()
 	users.insert_one({ 'name': name, 'email': email, 'watchlist': watchlist })
 	return ('successfully added user', 200)
+
+@api.route('/add_mention', methods=['POST'])
+def add_mention():
+	req_data = request.json
+	st_name = req_data['name']
+	st_update = req_data['update']
+	stocks.insert_one({'name': st_name, 'mentions': st_update })
+	return ('successfully added mention', 200)
+
+
 
 @api.route('/add_stock_mentions', methods=['POST'])
 def add_stock():
