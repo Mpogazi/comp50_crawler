@@ -56,7 +56,6 @@ def get_company_info():
 @api.route('/add_user', methods=['POST'])
 def add_user():
 	req_data = request.json
-	to = []
 	name = req_data['name']
 	email = req_data['email']
 	watchlist = req_data['watchlist']
@@ -79,30 +78,6 @@ def add_watchlist():
 @api.route('/users', methods=['GET'])
 def get_users():
 	return json.dumps(user)
-
-@api.route('/user_watchlist', methods=['POST'])
-def get_user_watchlist():
-	data = request.get_json()
-	try:
-		username = data['name']
-		user     = dumps(users.find({"name": username}))
-		return user['wishlist']
-	except:
-		return json.dumps({})
-
-@api.route('/update_stock', methods=['POST'])
-def post_update_stock():
-	data = request.get_json()
-	try:
-		stock = data['company']
-		user  = dumps(users.update())
-		return {data: "Successfully updated"}
-	except:
-		return {data: "Failed to Update"}
-
-@api.route('/create_watchlist', methods=['POST'])
-def create_watchlist():
-	pass
 
 if __name__ == "__main__":
 	api.run()
