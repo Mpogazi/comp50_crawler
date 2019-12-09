@@ -50,7 +50,6 @@ def get_company_info():
 			result = {'name': cp['Name'], 'symbol': cp['Symbol']}
 		return (result, 200)
 	except Exception as e:
-		print e
 		return ('Could not find company', 404)
 
 @api.route('/add_user', methods=['POST'])
