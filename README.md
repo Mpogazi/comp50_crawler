@@ -19,8 +19,20 @@ req_data: example:
     "watchlist": ["Apple Inc.", "Microsoft Inc.", "Google LLC."]
 }``
 
-- url: https://crawler-concurrency.herokuapp.com/
+- url: https://crawler-concurrency.herokuapp.com/get_companies
+method: GET
+req_data:
+returns: list of all companies in SP 500
+
+- url: https://crawler-concurrency.herokuapp.com/get_company_info
 method: POST
-req_data: example: 
-``{}``
+req_data: example:
+``{
+    "name": "Apple Inc."
+}``
+returns: 
+``{
+    "name" : "Apple Inc.",
+    "symbol": "APPL"
+}``
 
