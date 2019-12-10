@@ -8,7 +8,7 @@ from util import *
 def main():
     articles= Queue()
 
-    finder = ArticleFinder(2)
+    finder = ArticleFinder(1)
     finder.find_articles(articles)
 
     articles_file = open("articles.txt", "w")
