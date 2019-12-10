@@ -19,31 +19,24 @@ websites = db_50['websites']
 
 api = Flask(__name__)
 
-# def send_simple_message():
-# 	return requests.post(
-# 		"https://api.mailgun.net/v3/sandboxdb54350982b04926b51dc62456174097.mailgun.org/messages",
-# 		auth=("api", "b185da9453a6ef8352624808e205d7bb-5645b1f9-15f8d515"),
-# 		data={"from": "Mailgun Sandbox <postmaster@sandboxdb54350982b04926b51dc62456174097.mailgun.org>",
-# 			"to": "Pinto Leite Tomas <pintoleitetomas@gmail.com>",
-# 			"subject": "Hello Tomas",
-# 			"text": "Crawler team sent you an email!"})
-
-# send_simple_message()
-
-# def send_email():
-# 	message = Mail(
-# 		from_email='crawler@comp50.com',
-# 		to_emails='Fabrice.Mpogazi@tufts.edu',
-# 		subject='Sending with Twilio SendGrid is Fun',
-# 		html_content='<strong>and easy to do anywhere, even with Python</strong>')
-
-# 	sg = sendgrid.SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-# 	response = sg.send(message)
-# 	print(response.status_code, response.body, response.headers)
-
 @api.route('/', methods=['GET'])
 def get_index():
 	return json.dumps('successfully set the app')
+
+@api.route('/websites', methods=['GET'])
+def get_websites():
+	result = websites.find({})
+	return ({'data': result}, 200)
+
+@api.route('/add_websites', methods=['POST'])
+def add_websites():
+	req_data = request.json
+	webs     = req_data['websites']
+	try:
+		websites.update({}, {'$addToSet': {'websites': {'$each': webs}}}, upsert=True)
+		return ('successfully updated websites', 200)
+	except Exception as e:
+		return ('Failed Miserably', 404)
 
 @api.route('/get_companies', methods=['GET'])
 def get_companies():
@@ -55,7 +48,7 @@ def get_companies():
 
 @api.route('/get_company_info', methods=['POST'])
 def get_company_info():
-	req_data = request.json
+	req_data = request.get_json()
 	name = req_data['name']
 	try:
 		company = listings.find({'Name': name})
@@ -71,35 +64,33 @@ def add_user():
 	name = req_data['name']
 	email = req_data['email']
 	watchlist = req_data['watchlist']
-	# send_email()
 	users.insert_one({ 'name': name, 'email': email, 'watchlist': watchlist })
 	return ('successfully added user', 200)
 
 @api.route('/add_mention', methods=['POST'])
 def add_mention():
 	req_data = request.json
-	st_name = req_data['name']
-	st_update = req_data['update']
-	stocks.insert_one({'name': st_name, 'mentions': st_update })
+	name = req_data['name']
+	updates = req_data['update']
+	stocks.find_one_and_update({'name': name}, {'$set': {'name': name},'$addToSet': 
+										{'mentions': {'$each': updates}}}, upsert=True)
 	return ('successfully added mention', 200)
-
-
-
-@api.route('/add_stock_mentions', methods=['POST'])
-def add_stock():
-	req_data = request.json
-	st_name = req_data['name']
-	st_update = req_data['update']
-	stocks.update({ 'name': st_name}, { '$push': { 'mentions': { '$each': st_update } }})
-	return('successfully added the new mention', 200)
 
 @api.route('/add_watchlist', methods=[''])
 def add_watchlist():
-	return ('successfully added watchlist', 200)
+	req_data = request.json
+	email = req_data['email']
+	watchlist = req_data['watchlist']
+	try:
+		users.update({'email': email}, {'$addToSet': {'watchlist': {'$each': watchlist }}})
+		return ('successfully added watchlist', 200)
+	except Exception as e:
+		return ('Failed miserably', 404)
 
 @api.route('/users', methods=['GET'])
 def get_users():
-	return json.dumps(user)
+	list_users = users.find({})
+	return ({'data' : list_users}, 200)
 
 if __name__ == "__main__":
 	api.run()
