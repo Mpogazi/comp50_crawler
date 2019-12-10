@@ -78,8 +78,11 @@ def add_user():
 @api.route('/add_mention', methods=['POST'])
 def add_mention():
 	print(request.form['name'])
-	print(request.form['update']['article_url'])
-	print(request.form['update']['article_title'])
+	updates = []
+	for elem in request.form['update']:
+		temp = {'article_url': elem['article_url'], 'article_title': elem['article_title']}
+		updates.append(temp)
+	print(updates)
 	return ('successfully added mention', 200)
 
 
