@@ -1,7 +1,6 @@
 from urllib.request import urlopen
-from crawler.link_finder import LinkFinder
-from queue import Queue
 from crawler.util import *
+from queue import Queue
 
 class Crawler:
 
@@ -12,8 +11,8 @@ class Crawler:
     to_be_crawled = set()
     crawled       = set()
 
-    def __init__(self, publication, base_url, domain_name, article_dir, articles_queue):
-        print("New Crawler Crawling: " + publication)
+    def __init__(self, publication, base_url, domain_name, article_dir, 
+                 articles_queue):
         self.print_urlsets()
         Crawler.base_url      = base_url
         Crawler.domain_name   = domain_name
@@ -29,7 +28,6 @@ class Crawler:
     @staticmethod
     def crawl_page(page_url, articles_queue):
         if page_url not in Crawler.crawled:
-            print('| Queue ' + str(len(Crawler.to_be_crawled)) + ' | Crawled  ' + str(len(Crawler.crawled)))
             Crawler.add_links_to_be_crawled(Crawler.gather_links(page_url))
             Crawler.to_be_crawled.remove(page_url)
             if Crawler.article_dir  in page_url:                
@@ -53,7 +51,8 @@ class Crawler:
             return set()
         return finder.page_links()
 
-    # Add links to to_be_crawled if correct domain and not crawled or in to_be_crawled
+    # Add links to to_be_crawled if correct domain and not crawled or in 
+    # to_be_crawled
     @staticmethod
     def add_links_to_be_crawled(links):
         for url in links:
@@ -72,4 +71,3 @@ class Crawler:
     def print_urlsets():
         print(Crawler.to_be_crawled)
         print(Crawler.crawled)
-

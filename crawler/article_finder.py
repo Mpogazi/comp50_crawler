@@ -14,7 +14,8 @@ class ArticleFinder():
     # Create worker threads (will die when main exits)
     def create_workers(self, num_threads, queue, articles_queue):
         for _ in range(num_threads):
-            t = threading.Thread(target=self.work, args=(queue, articles_queue,))
+            t = threading.Thread(target=self.work, 
+                                 args=(queue, articles_queue,))
             t.daemon = True
             t.start()
 
@@ -39,25 +40,26 @@ class ArticleFinder():
             if curr_depth < self.depth:
                 self.create_jobs(curr_depth + 1, queue, to_be_crawled)
 
-    def crawl_publication(self, publication, homepage, num_threads, article_dir, articles_queue):
+    def crawl_publication(self, publication, homepage, 
+                          num_threads, article_dir, articles_queue):
         domain_name  = get_domain_name(homepage)
         queue        = Queue()
-        Crawler(publication, homepage, domain_name, article_dir, articles_queue)
+        Crawler(publication, homepage, domain_name, article_dir, 
+                articles_queue)
         self.create_workers(num_threads, queue, articles_queue)
         self.crawl(0, queue, Crawler.to_be_crawled)
 
-
-
     def find_articles(self, articles_queue):
-
-        publications = [("kiplinger", "https://kiplinger.com", NUM_THREADS, "article"),
-                        ("thestreet", "https://thestreet.com", NUM_THREADS, "investing"),
-                        ("economist", "https://economist.com", NUM_THREADS, "finance-and-economics"),
-                        ("marketwatch", "https://www.marketwatch.com", NUM_THREADS, "story")]
-
+        publications = [("kiplinger", "https://kiplinger.com", 
+                         NUM_THREADS, "article"),
+                        ("thestreet", "https://thestreet.com", 
+                         NUM_THREADS, "investing"),
+                        ("economist", "https://economist.com", 
+                         NUM_THREADS, "finance-and-economics"),
+                        ("marketwatch", "https://www.marketwatch.com", 
+                         NUM_THREADS, "story")]
         for i in publications:
             publication, homepage, num_threads, article_dir = i
-            self.crawl_publication(publication, homepage, num_threads, article_dir, articles_queue)
-            
-
+            self.crawl_publication(publication, homepage, num_threads, 
+                                   article_dir, articles_queue)
         articles_queue.put("ANALYZER_STOP")
