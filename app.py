@@ -1,10 +1,12 @@
 #! /usr/bin/python
 
 from pymongo import MongoClient
+# import requests
 from flask import Flask, json, request, jsonify
 from bson.json_util import dumps
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
+import os
+import sendgrid
+from sendgrid.helpers.mail import *
 
 URI = "ds253418.mlab.com"
 db_50    = MongoClient(URI, 53418)
@@ -14,17 +16,30 @@ listings = db_50['listings']
 stocks   = db_50['stocks']
 users    = db_50['users']
 websites = db_50['websites']
-send_grid_api_key ='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'
 
 api = Flask(__name__)
 
-def send_email(src, to, subj, content):
-	message = Mail(from_email=src, to_emails=to, subject=subj, html_content=content)
-	try:
-		sg = SendGridAPIClient(send_grid_api_key)
-		response = sg.send(message)
-	except Exception as e:
-		print(e.message)
+# def send_simple_message():
+# 	return requests.post(
+# 		"https://api.mailgun.net/v3/sandboxdb54350982b04926b51dc62456174097.mailgun.org/messages",
+# 		auth=("api", "b185da9453a6ef8352624808e205d7bb-5645b1f9-15f8d515"),
+# 		data={"from": "Mailgun Sandbox <postmaster@sandboxdb54350982b04926b51dc62456174097.mailgun.org>",
+# 			"to": "Pinto Leite Tomas <pintoleitetomas@gmail.com>",
+# 			"subject": "Hello Tomas",
+# 			"text": "Crawler team sent you an email!"})
+
+# send_simple_message()
+
+# def send_email():
+# 	message = Mail(
+# 		from_email='crawler@comp50.com',
+# 		to_emails='Fabrice.Mpogazi@tufts.edu',
+# 		subject='Sending with Twilio SendGrid is Fun',
+# 		html_content='<strong>and easy to do anywhere, even with Python</strong>')
+
+# 	sg = sendgrid.SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+# 	response = sg.send(message)
+# 	print(response.status_code, response.body, response.headers)
 
 @api.route('/', methods=['GET'])
 def get_index():
@@ -48,7 +63,6 @@ def get_company_info():
 			result = {'name': cp['Name'], 'symbol': cp['Symbol']}
 		return (result, 200)
 	except Exception as e:
-		print e
 		return ('Could not find company', 404)
 
 @api.route('/add_user', methods=['POST'])
@@ -57,10 +71,19 @@ def add_user():
 	name = req_data['name']
 	email = req_data['email']
 	watchlist = req_data['watchlist']
-	send_email('fbigabiro@gmail.com', email, 'Welcome to Comp 50 Crawler', 
-			   'Hello, the crawler team welcomes you and your watchlist. Excited to have you!')
+	# send_email()
 	users.insert_one({ 'name': name, 'email': email, 'watchlist': watchlist })
 	return ('successfully added user', 200)
+
+@api.route('/add_mention', methods=['POST'])
+def add_mention():
+	req_data = request.json
+	st_name = req_data['name']
+	st_update = req_data['update']
+	stocks.insert_one({'name': st_name, 'mentions': st_update })
+	return ('successfully added mention', 200)
+
+
 
 @api.route('/add_stock_mentions', methods=['POST'])
 def add_stock():
@@ -78,29 +101,5 @@ def add_watchlist():
 def get_users():
 	return json.dumps(user)
 
-@api.route('/user_watchlist', methods=['POST'])
-def get_user_watchlist():
-	data = request.get_json()
-	try:
-		username = data['name']
-		user     = dumps(users.find({"name": username}))
-		return user['wishlist']
-	except:
-		return json.dumps({})
-
-@api.route('/update_stock', methods=['POST'])
-def post_update_stock():
-	data = request.get_json()
-	try:
-		stock = data['company']
-		user  = dumps(users.update())
-		return {data: "Successfully updated"}
-	except:
-		return {data: "Failed to Update"}
-
-@api.route('/create_watchlist', methods=['POST'])
-def create_watchlist():
-	pass
-
 if __name__ == "__main__":
-	api.run(threaded=True, port=5000)
+	api.run()
