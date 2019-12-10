@@ -5,55 +5,39 @@ from crawler.util import *
 
 class Crawler:
 
-    dir_name = ''
     base_url = ''
     domain_name = ''
     article_dir = ''    
-    queue_file = ''
-    crawled_file = ''
     articles_file = ''
-    queue = set()
-    crawled = set()
+    to_be_crawled = set()
+    crawled       = set()
 
-    def __init__(self, dir_name, base_url, domain_name, article_dir, articles_queue):
-        Crawler.dir_name      = dir_name
+    def __init__(self, publication, base_url, domain_name, article_dir, articles_queue):
+        print("New Crawler Crawling: " + publication)
+        self.print_urlsets()
         Crawler.base_url      = base_url
         Crawler.domain_name   = domain_name
         Crawler.article_dir   = article_dir
-        Crawler.queue_file    = Crawler.dir_name + '/queue.txt'
-        Crawler.crawled_file  = Crawler.dir_name + '/crawled.txt'
-        Crawler.articles_file = Crawler.dir_name + '/articles.txt'
-        self.boot()
+        Crawler.articles_file = 'articles.txt'
+        Crawler.to_be_crawled.clear()
+        Crawler.crawled.clear() 
+        Crawler.to_be_crawled.add(Crawler.base_url)
         self.crawl_page(Crawler.base_url, articles_queue)
 
-    # Creates directory and files for dir on first run and starts the spider
-    @staticmethod
-    def boot():
-        create_dir(Crawler.dir_name)
-        create_data_files(Crawler.dir_name, Crawler.base_url)
-        Crawler.queue    = file_to_set(Crawler.queue_file)
-        Crawler.crawled  = file_to_set(Crawler.crawled_file)
-        Crawler.articles = file_to_set(Crawler.articles_file)
-
-    # Updates user display, fills queue and updates files
+    # Populate to_be_crawled with links found in HTML of page_url
+    # If link article, also add to shared articles queue
     @staticmethod
     def crawl_page(page_url, articles_queue):
         if page_url not in Crawler.crawled:
-            #print(thread_name + ' now crawling ' + page_url)
-<<<<<<< HEAD
-            print(Crawler.dir_name + '| Queue ' + str(len(Crawler.queue)) + ' | Crawled  ' + str(len(Crawler.crawled)))
-=======
-            print('Queue ' + str(len(Crawler.queue)) + ' | Crawled  ' + str(len(Crawler.crawled)))
->>>>>>> 3cf2527182b12cc5b249f76b5fdd2018ffbd1ded
-            #print("PAGE_URL_IS-     " + page_url)
-            Crawler.add_links_to_queue(Crawler.gather_links(page_url))
-            Crawler.queue.remove(page_url)
+            print('| Queue ' + str(len(Crawler.to_be_crawled)) + ' | Crawled  ' + str(len(Crawler.crawled)))
+            Crawler.add_links_to_be_crawled(Crawler.gather_links(page_url))
+            Crawler.to_be_crawled.remove(page_url)
             if Crawler.article_dir  in page_url:                
                 articles_queue.put(page_url)
             Crawler.crawled.add(page_url)
-            Crawler.update_files()
 
-    # Converts raw response data into readable information and checks for proper html formatting
+    # Check good html formatting
+    # Return all urls found on page as set of links
     @staticmethod
     def gather_links(page_url):
         html_string = ''
@@ -69,20 +53,23 @@ class Crawler:
             return set()
         return finder.page_links()
 
-    # Saves queue data to dir files
+    # Add links to to_be_crawled if correct domain and not crawled or in to_be_crawled
     @staticmethod
-    def add_links_to_queue(links):
+    def add_links_to_be_crawled(links):
         for url in links:
-            if (url in Crawler.queue) or (url in Crawler.crawled):
+            if (url in Crawler.to_be_crawled) or (url in Crawler.crawled):
                 continue
             if Crawler.domain_name != get_domain_name(url):
                 continue
-            Crawler.queue.add(url)
+            Crawler.to_be_crawled.add(url)
 
     @staticmethod
-    def update_files():
-        set_to_file(Crawler.queue, Crawler.queue_file)
-        set_to_file(Crawler.crawled, Crawler.crawled_file)
-        set_to_file(Crawler.articles, Crawler.articles_file)
+    def reset_urlsets():
+        Crawler.to_be_crawled.clear()
+        Crawler.crawled.clear()
 
+    @staticmethod
+    def print_urlsets():
+        print(Crawler.to_be_crawled)
+        print(Crawler.crawled)
 
