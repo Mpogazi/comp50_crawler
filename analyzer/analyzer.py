@@ -18,7 +18,7 @@ Synchronization:
            main dictionary.
 
 Usage:
-    - Create an object by passing in a list of stocks, a synchronized queue, 
+    - Create an object by passing in a list of stocks, a synchronized queue,
     the number of threads, and a URL for a database
     - use the start() method to start the threads and the join() method to wait
     for them to end and update the database
@@ -49,9 +49,9 @@ class Analyzer:
 
 
         # parallel dictionaries
-        self.relevant_articles = {i:{"name": i, "update": []} 
+        self.relevant_articles = {i:{"name": i, "update": []}
                                         for i in stock_names}
-        self.stock_locks       = {i:threading.Lock() 
+        self.stock_locks       = {i:threading.Lock()
                                         for i in stock_names}
 
 
@@ -77,16 +77,16 @@ class Analyzer:
         '''sends updates to the databse'''
         if not self.DB_URL == "":
             for stock in self.relevant_articles.keys():
-                print(self.relevant_articles[stock])
-                requests.post(self.DB_URL, data = self.relevant_articles[stock])
+                #print(self.relevant_articles[stock]) # used for presentation
+                requests.post(self.DB_URL, json = self.relevant_articles[stock])
         return
 
     def analyze(self):
         '''This function is executed by each thread.
-           - It it takes a url from the job queue, gets the 
+           - It it takes a url from the job queue, gets the
              page, and reads the article looking for any mention
              of stock names.
-           - If a stock is mentioned, the url gets added to that 
+           - If a stock is mentioned, the url gets added to that
              stock's key in the dictionary.
         '''
         sys.stderr.write(threading.current_thread().name + " started\n")
@@ -99,7 +99,7 @@ class Analyzer:
             except:
                 sys.stderr.write(threading.current_thread().name +
                                  " --- Error: Could not open " + url)
-                
+
                 try:
                     url = self.queue.get(True, 20)
                 except:
