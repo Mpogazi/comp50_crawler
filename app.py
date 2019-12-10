@@ -77,12 +77,8 @@ def add_user():
 
 @api.route('/add_mention', methods=['POST'])
 def add_mention():
-	print(request.args)
-	print(request.form)
-	print(request.files)
-	print(request.values)
-	print(request.get_json(force=True))
-	stocks.insert_one({'data':request.form})
+	print(request.form['name'])
+	print(request.form['update'])
 	return ('successfully added mention', 200)
 
 
