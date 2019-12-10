@@ -79,6 +79,8 @@ class Analyzer:
             for stock in self.relevant_articles.keys():
                 #print(self.relevant_articles[stock]) # used for presentation
                 requests.post(self.DB_URL, json = self.relevant_articles[stock])
+                with self.stock_locks[stock]:
+                    self.relevant_articles[stock]["update"].clear()
         return
 
     def analyze(self):
@@ -90,7 +92,10 @@ class Analyzer:
              stock's key in the dictionary.
         '''
         sys.stderr.write(threading.current_thread().name + " started\n")
-        url = self.queue.get(True, 10)
+        try:
+            url = self.queue.get(True)
+        except:
+            return
         while url != Analyzer.STOP:
 
             try:
@@ -101,9 +106,9 @@ class Analyzer:
                                  " --- Error: Could not open " + url)
 
                 try:
-                    url = self.queue.get(True, 20)
+                    url = self.queue.get(True)
                 except:
-                    continue
+                    break
 
             for stock in self.stock_names:
                 to_search = self.clean_stock(stock)
@@ -122,7 +127,7 @@ class Analyzer:
                                  "article_url": url})
                             break
             try:
-                url = self.queue.get(True, 20)
+                url = self.queue.get(True)
             except:
                 break
             self.update_db()
@@ -137,6 +142,9 @@ class Analyzer:
             if c_word in stock_name:
                 stock_name = " ".join(stock_name.split()[:-1])
         return stock_name
+
+    def get_data(self):
+        return self.relevant_articles
 
 
 
