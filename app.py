@@ -55,7 +55,7 @@ def get_companies():
 
 @api.route('/get_company_info', methods=['POST'])
 def get_company_info():
-	req_data = request.json
+	req_data = request.get_json()
 	name = req_data['name']
 	try:
 		company = listings.find({'Name': name})
@@ -77,7 +77,8 @@ def add_user():
 
 @api.route('/add_mention', methods=['POST'])
 def add_mention():
-	req_data = request.json.form
+	req_data = request.get_json()
+	print(req_data)
 	stocks.insert_one({'data':req_data})
 	return ('successfully added mention', 200)
 

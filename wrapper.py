@@ -29,8 +29,3 @@ class Wrapper:
         a.start()
         crawler.find_articles(articles_queue)
         a.join()
-
-
-if __name__ == "__main__":
-    prog = Wrapper()
-    prog.run()
