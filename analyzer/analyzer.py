@@ -47,7 +47,6 @@ class Analyzer:
         self.num_threads = num_threads
         self.threads     = []
 
-
         # parallel dictionaries
         self.relevant_articles = {i:{"name": i, "update": []}
                                         for i in stock_names}
@@ -71,7 +70,7 @@ class Analyzer:
         for thread in self.threads:
             thread.join()
 
-        self.update_db()
+        #self.update_db()
 
     def update_db(self):
         '''sends updates to the databse'''
@@ -107,6 +106,7 @@ class Analyzer:
 
                 try:
                     url = self.queue.get(True)
+                    continue
                 except:
                     break
 
@@ -130,7 +130,7 @@ class Analyzer:
                 url = self.queue.get(True)
             except:
                 break
-            self.update_db()
+            #self.update_db()
 
 
         self.queue.put(Analyzer.STOP)
