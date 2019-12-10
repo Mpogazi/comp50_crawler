@@ -11,7 +11,6 @@ class ArticleFinder():
     def __init__(self, depth):
         self.depth = depth
 
-    # Create worker threads (will die when main exits)
     def create_workers(self, num_threads, queue, articles_queue):
         for _ in range(num_threads):
             t = threading.Thread(target=self.work, 
@@ -19,14 +18,12 @@ class ArticleFinder():
             t.daemon = True
             t.start()
 
-    # Do the next job in the queue
     def work(self, queue, articles_queue):
         while True:
             url = queue.get()
             Crawler.crawl_page(url, articles_queue)
             queue.task_done()
 
-    # Each queued link is a new job
     def create_jobs(self, curr_depth, queue, to_be_crawled):
         for link in to_be_crawled: 
             queue.put(link)
@@ -36,7 +33,6 @@ class ArticleFinder():
     # Check if there are items in the queue, if so crawl them
     def crawl(self, curr_depth, queue, to_be_crawled):
         if len(to_be_crawled) > 0:
-            #print(str(len(queued_links)) + ' links in the queue')
             if curr_depth < self.depth:
                 self.create_jobs(curr_depth + 1, queue, to_be_crawled)
 

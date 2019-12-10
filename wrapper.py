@@ -49,6 +49,7 @@ class Wrapper:
 
         a.start()
         crawler.find_articles(articles_queue)
+<<<<<<< HEAD
         a.join()
         self.data = a.get_data()
 
@@ -76,3 +77,6 @@ if __name__ == "__main__":
         prog = Wrapper(watchlist)
     prog.run()
     prog.print_results()
+=======
+        a.join()
+>>>>>>> 78959c2e749f50e55f17ad133dd93a990c8cc7ac
