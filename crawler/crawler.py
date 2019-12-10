@@ -1,7 +1,7 @@
 from urllib.request import urlopen
-from link_finder import LinkFinder
+from crawler.link_finder import LinkFinder
 from queue import Queue
-from util import *
+from crawler.util import *
 
 class Crawler:
 
@@ -40,7 +40,7 @@ class Crawler:
     def crawl_page(page_url, articles_queue):
         if page_url not in Crawler.crawled:
             #print(thread_name + ' now crawling ' + page_url)
-            #print('Queue ' + str(len(Crawler.queue)) + ' | Crawled  ' + str(len(Crawler.crawled)))
+            print('Queue ' + str(len(Crawler.queue)) + ' | Crawled  ' + str(len(Crawler.crawled)))
             #print("PAGE_URL_IS-     " + page_url)
             Crawler.add_links_to_queue(Crawler.gather_links(page_url))
             Crawler.queue.remove(page_url)

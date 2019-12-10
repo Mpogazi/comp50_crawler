@@ -16,6 +16,12 @@ Synchronization:
            so to prevent two threads from changing something at the same index,
            we've made a second dictionary that holds locks for each item in the
            main dictionary.
+
+Usage:
+    - Create an object by passing in a list of stocks, a synchronized queue, 
+    the number of threads, and a URL for a database
+    - use the start() method to start the threads and the join() method to wait
+    for them to end and update the database
 '''
 
 
@@ -37,38 +43,53 @@ class Analyzer:
 
     def __init__(self, stock_names, articles_queue, num_threads, DB_url = ""):
         self.stock_names = stock_names
-        self.queue = links_q
+        self.queue       = articles_queue
         self.num_threads = num_threads
-        self.threads = []
+        self.threads     = []
 
 
         # parallel dictionaries
-        self.relevant_articles = {i:{"name": i, "update": []} for i in stock_names}
-        self.stock_locks = {i:threading.Lock() for i in stock_names}
+        self.relevant_articles = {i:{"name": i, "update": []} 
+                                        for i in stock_names}
+        self.stock_locks       = {i:threading.Lock() 
+                                        for i in stock_names}
 
-        self.DB_URL = DB_url
+
+        self.DB_URL        = DB_url
         self.company_words = ["Inc.", "LLC", "Corp.", "Co."]
 
 
     def start(self):
+        '''Starts consumer threads that take articles from self.queue'''
         self.threads = [threading.Thread(target = self.analyze, args = [])
                         for i in range(self.num_threads)]
         for thread in self.threads:
             thread.start()
 
     def join(self):
+        '''Waits for each thread to finish and then updates the database'''
         for thread in self.threads:
             thread.join()
 
         self.update_db()
 
     def update_db(self):
+        '''sends updates to the databse'''
         if not self.DB_URL == "":
             for stock in self.relevant_articles.keys():
+                print(self.relevant_articles[stock])
                 requests.post(self.DB_URL, data = self.relevant_articles[stock])
         return
 
     def analyze(self):
+        '''This function is executed by each thread.
+           - It it takes a url from the job queue, gets the 
+             page, and reads the article looking for any mention
+             of stock names.
+           - If a stock is mentioned, the url gets added to that 
+             stock's key in the dictionary.
+        '''
+        sys.stderr.write(threading.current_thread().name + " started\n")
         url = self.queue.get(True, 10)
         while url != Analyzer.STOP:
 
@@ -78,8 +99,11 @@ class Analyzer:
             except:
                 sys.stderr.write(threading.current_thread().name +
                                  " --- Error: Could not open " + url)
-                url = self.queue.get(True, 10)
-                continue
+                
+                try:
+                    url = self.queue.get(True, 20)
+                except:
+                    continue
 
             for stock in self.stock_names:
                 to_search = self.clean_stock(stock)
@@ -97,12 +121,18 @@ class Analyzer:
                                 {"article_title":soup.title.text,
                                  "article_url": url})
                             break
-            url = self.queue.get(True, 10)
+            try:
+                url = self.queue.get(True, 20)
+            except:
+                break
+            self.update_db()
+
 
         self.queue.put(Analyzer.STOP)
 
 
     def clean_stock(self, stock_name):
+        '''Removes the 'Inc.' or 'Co.' (etc.) from a company's name'''
         for c_word in self.company_words:
             if c_word in stock_name:
                 stock_name = " ".join(stock_name.split()[:-1])
@@ -112,7 +142,7 @@ class Analyzer:
 
 # **********************  Testing Only  *******************************
 
-    def test_produce(self):
+    def __test_produce(self):
         # f = open("testQueue.txt")
         # for url in f:
         #     self.queue.put(url)
@@ -124,7 +154,7 @@ class Analyzer:
 
 
 
-    def print_relevant_articles(self):
+    def __print_relevant_articles(self):
         for stock in self.relevant_articles.keys():
             print(stock)
             for article in self.relevant_articles[stock]["update"]:
@@ -140,9 +170,9 @@ if __name__ == '__main__':
     queue = queue.Queue()
     a = Analyzer(["Apple Inc.", "Microsoft Inc.",
            "Amazon Co.", "TD", "Tesla", "Google LLC."], queue, 15, "")
-    a.test_produce()
+    a.__test_produce()
     start_time = time.time()
     a.start()
     a.join()
-    #a.print_relevant_articles()
+    #a.__print_relevant_articles()
     print(time.time() - start_time)
