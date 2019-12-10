@@ -36,3 +36,12 @@ returns:
     "symbol": "APPL"
 }``
 
+- url: https://crawler-concurrency.herokuapp.com/add_mention
+method: POST
+req_data: example:
+``{
+    "name": "Apple Inc.",
+    "update": [{"article_title": "Apple is broken", "article_url": "apple.com"}, {"article_title": "Apple is mad","article_url": "lkjdsfasjldkafd.com"}]
+}``
+returns: ``successfully added mention``
+

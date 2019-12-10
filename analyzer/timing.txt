@@ -1,0 +1,10 @@
+~100 articles (same url):
+    1 thread:    99 seconds
+    10 threads:  91 seconds
+    100 threads: 92 seconds
+
+20  articles (same url):
+    1 thread:    17.7 seconds
+    10 threads:  17.13 seconds
+    20 threads:  17.7
+    

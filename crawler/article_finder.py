@@ -1,8 +1,10 @@
 import sys
 import threading
 from queue import Queue
-from crawler import Crawler
-from util import *
+from crawler.crawler import Crawler
+from crawler.util import *
+
+THREADS = 8
 
 NUM_THREADS = 8
 
@@ -10,7 +12,7 @@ class ArticleFinder():
 
     def __init__(self, depth):
         self.depth = depth
-        
+
     # Create worker threads (will die when main exits)
     def create_workers(self, num_threads, queue, articles_queue):
         for _ in range(num_threads):
@@ -20,7 +22,7 @@ class ArticleFinder():
 
     # Do the next job in the queue
     def work(self, queue, articles_queue):
-        while True: 
+        while True:
             url = queue.get()
             Crawler.crawl_page(url, articles_queue)
             queue.task_done()
@@ -29,7 +31,7 @@ class ArticleFinder():
     def create_jobs(self, curr_depth, queue, queue_file):
         for link in file_to_set(queue_file):
             queue.put(link)
-        queue.join()    
+        queue.join()
         self.crawl(curr_depth, queue, queue_file)
 
     # Check if there are items in the queue, if so crawl them
@@ -43,18 +45,26 @@ class ArticleFinder():
 
     def crawl_publication(self, project_name, homepage, num_threads, article_dir, articles_queue):
         domain_name  = get_domain_name(homepage)
-        queue_file   = project_name + '/queue.txt' 
-        queue        = Queue() 
+        queue_file   = project_name + '/queue.txt'
+        queue        = Queue()
         Crawler(project_name, homepage, domain_name, article_dir, articles_queue)
         self.create_workers(num_threads, queue, articles_queue)
-        self.crawl(0, queue, queue_file)    
+        self.crawl(0, queue, queue_file)
 
     def find_articles(self, articles_queue):
+<<<<<<< HEAD
         publications = [("kiplinger", "https://kiplinger.com", NUM_THREADS, "article"),
                         ("thestreet", "https://thestreet.com", NUM_THREADS, "investing"),
                         ("economist", "https://economist.com", NUM_THREADS, "finance-and-economics"),
                         ("marketwatch", "https://www.marketwatch.com", NUM_THREADS, "story")]
         #                ("cabotwealth", "https://www.cabotwealth.com", NUM_THREADS, "growth-stocks")]
+=======
+        publications = [("kiplinger", "https://kiplinger.com", THREADS, "article"),
+                        ("thestreet", "https://thestreet.com", THREADS, "investing"),
+                        ("economist", "https://economist.com", THREADS, "finance-and-economics"),
+                        ("marketwatch", "https://www.marketwatch.com", THREADS, "story"),
+                        ("cabotwealth", "https://www.cabotwealth.com", THREADS, "growth-stocks")]
+>>>>>>> 3cf2527182b12cc5b249f76b5fdd2018ffbd1ded
         for i in publications:
             proj_name, homepage, num_threads, article_dir = i
             self.crawl_publication(proj_name, homepage, num_threads, article_dir, articles_queue)
