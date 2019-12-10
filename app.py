@@ -77,9 +77,11 @@ def add_user():
 
 @api.route('/add_mention', methods=['POST'])
 def add_mention():
-	print(request.json)
+	req_data = request.json
+	name = req_data['name']
+	updates = req_data['update']
+	stocks.find_one_and_update({'name': name}, {'$set': {'name': name},'$push': {'mentions': {'$each': updates}}}, upsert=True)
 	return ('successfully added mention', 200)
-
 
 @api.route('/add_stock_mentions', methods=['POST'])
 def add_stock():
