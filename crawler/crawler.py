@@ -61,13 +61,3 @@ class Crawler:
             if Crawler.domain_name != get_domain_name(url):
                 continue
             Crawler.to_be_crawled.add(url)
-
-    @staticmethod
-    def reset_urlsets():
-        Crawler.to_be_crawled.clear()
-        Crawler.crawled.clear()
-
-    @staticmethod
-    def print_urlsets():
-        print(Crawler.to_be_crawled)
-        print(Crawler.crawled)
