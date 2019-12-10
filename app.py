@@ -71,7 +71,6 @@ def add_user():
 	name = req_data['name']
 	email = req_data['email']
 	watchlist = req_data['watchlist']
-	# send_email()
 	users.insert_one({ 'name': name, 'email': email, 'watchlist': watchlist })
 	return ('successfully added user', 200)
 
@@ -80,7 +79,7 @@ def add_mention():
 	req_data = request.json
 	name = req_data['name']
 	updates = req_data['update']
-	stocks.find_one_and_update({'name': name}, {'$set': {'name': name},'$push': {'mentions': {'$each': updates}}}, upsert=True)
+	stocks.find_one_and_update({'name': name}, {'$set': {'name': name},'$addToSet': {'mentions': {'$each': updates}}}, upsert=True)
 	return ('successfully added mention', 200)
 
 @api.route('/add_stock_mentions', methods=['POST'])
